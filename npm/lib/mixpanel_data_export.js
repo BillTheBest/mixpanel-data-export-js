@@ -16,6 +16,21 @@ MixpanelExport = (function() {
     this.timeout_after = this.opts.timeout_after || 10;
   }
 
+  MixpanelExport.prototype.export = function(parameters, callback) {
+    var export_stub = "http://data.mixpanel.com/api/2.0/export/?";
+    var requestUrl = export_stub + (this._requestParameterString(parameters));
+    var request = new XMLHttpRequest;
+    var success = function() {
+      var result = this.responseText.split('\n');
+      result.pop();
+      result = result.map(JSON.parse);
+      callback(result);
+    }
+    request.onload = success;
+    request.open("get", requestUrl, true);
+    request.send();
+  }
+
   MixpanelExport.prototype.events = function(parameters, callback) {
     return this.get("events", parameters, callback);
   };
